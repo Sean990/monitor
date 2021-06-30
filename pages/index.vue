@@ -101,41 +101,10 @@ export default {
 		};
 	},
 	onLoad() {
-		//注意，安卓需要配置下manifest.json文件，打开后，进入模块权限配置，在右侧的Android权限设置里勾选上android.permission.BATTERY_STATS
-		let main = plus.android.runtimeMainActivity();
-		let Intent = plus.android.importClass('android.content.Intent');
-		let recevier = plus.android.implements('io.dcloud.feature.internal.reflect.BroadcastReceiver', {
-			onReceive: (context, intent) => {
-				let action = intent.getAction();
-				if (action == Intent.ACTION_BATTERY_CHANGED) {
-					this.power = intent.getIntExtra('level', 0); //电量
-				}
-			}
-		});
-		let IntentFilter = plus.android.importClass('android.content.IntentFilter');
-		let filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-		main.registerReceiver(recevier, filter);
+		// 初始化数据
+		let initID = setInterval(this.appInit, 3000);
+		this.appInit();
 
-		let wifiManager, wifiInfo;
-		let Context = plus.android.importClass('android.content.Context');
-		let WifiManager = plus.android.importClass('android.net.wifi.WifiManager');
-		let WifiInfo = plus.android.importClass('android.net.wifi.WifiInfo');
-		wifiManager = plus.android.runtimeMainActivity().getSystemService(Context.WIFI_SERVICE);
-		wifiInfo = wifiManager.getConnectionInfo();
-		let ssid = wifiInfo.getSSID() || '';
-		if (ssid.length == 0) {
-			this.netWorkName = '未知网络';
-		}
-		//一些手机上获取SSID是有值的，但是实际IP为空，真实为未连接
-		let i = parseInt(wifiInfo.getIpAddress());
-		let ipStr = (i & 0xff) + '.' + ((i >> 8) & 0xff) + '.' + ((i >> 16) & 0xff) + '.' + ((i >> 24) & 0xff);
-		if (ipStr == '0.0.0.0') {
-			this.netWorkName = '未知网络';
-		}
-
-		if (ssid != '<unknown ssid>' && ssid.toUpperCase() != '0X') {
-			this.netWorkName = `WIFI：${ssid.replace(/\"/g, '')}`;
-		}
 		// 当前时间
 		let timerID = setInterval(this.updateTime, 1000);
 		this.updateTime();
@@ -145,6 +114,43 @@ export default {
 		this.queryWeather();
 	},
 	methods: {
+		appInit() {
+			//注意，安卓需要配置下manifest.json文件，打开后，进入模块权限配置，在右侧的Android权限设置里勾选上android.permission.BATTERY_STATS
+			let main = plus.android.runtimeMainActivity();
+			let Intent = plus.android.importClass('android.content.Intent');
+			let recevier = plus.android.implements('io.dcloud.feature.internal.reflect.BroadcastReceiver', {
+				onReceive: (context, intent) => {
+					let action = intent.getAction();
+					if (action == Intent.ACTION_BATTERY_CHANGED) {
+						this.power = intent.getIntExtra('level', 0); //电量
+					}
+				}
+			});
+			let IntentFilter = plus.android.importClass('android.content.IntentFilter');
+			let filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+			main.registerReceiver(recevier, filter);
+
+			let wifiManager, wifiInfo;
+			let Context = plus.android.importClass('android.content.Context');
+			let WifiManager = plus.android.importClass('android.net.wifi.WifiManager');
+			let WifiInfo = plus.android.importClass('android.net.wifi.WifiInfo');
+			wifiManager = plus.android.runtimeMainActivity().getSystemService(Context.WIFI_SERVICE);
+			wifiInfo = wifiManager.getConnectionInfo();
+			let ssid = wifiInfo.getSSID() || '';
+			if (ssid.length == 0) {
+				this.netWorkName = '未知网络';
+			}
+			//一些手机上获取SSID是有值的，但是实际IP为空，真实为未连接
+			let i = parseInt(wifiInfo.getIpAddress());
+			let ipStr = (i & 0xff) + '.' + ((i >> 8) & 0xff) + '.' + ((i >> 16) & 0xff) + '.' + ((i >> 24) & 0xff);
+			if (ipStr == '0.0.0.0') {
+				this.netWorkName = '未知网络';
+			}
+
+			if (ssid != '<unknown ssid>' && ssid.toUpperCase() != '0X') {
+				this.netWorkName = `WIFI：${ssid.replace(/\"/g, '')}`;
+			}
+		},
 		updateTime() {
 			const week = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
 			let date = new Date();
