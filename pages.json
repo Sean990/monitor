@@ -1,0 +1,19 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index",
+			"style": {
+				"navigationBarTitleText": "监控台",
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "black"
+			}
+		}
+    ],
+	"globalStyle": {
+		"pageOrientation": "landscape",
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "监控台",
+		"navigationBarBackgroundColor": "#000000",
+		"backgroundColor": "#000000"
+	}
+}
