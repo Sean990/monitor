@@ -14,7 +14,7 @@ export default function (res) {
 		});
 		return Promise.reject(res.data);
 	}
-	if (res.data.code != 200) {
+	if (res.data.code != 200 && Object.keys(res.data).length < 3) {
 		return showToast(res.msg || "发生错误了，请联系工程师").then(() => {
 			return Promise.reject(res.data);
 		});

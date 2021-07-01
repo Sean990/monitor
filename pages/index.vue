@@ -13,7 +13,7 @@
 				<view class="other">{{ cityName }} 湿度{{ weatherInfo.humidity }}% {{ weatherInfo.windDir }}{{ weatherInfo.windScale }}级</view>
 			</view>
 			<view class="device-info">
-				<text class="info">电量：{{ power }}%</text>
+				<text class="info" style="width: 40%;">电量：{{ power }}%</text>
 				<text class="info">{{ netWorkName }}</text>
 			</view>
 		</view>
@@ -21,50 +21,58 @@
 		<view class="monitor-right">
 			<view class="title">服务器性能监控</view>
 			<view class="info">
-				<view class="name">服务器名称：Sean</view>
-				<view class="ip">IP地址：192.168.0.1</view>
+				<view class="name">服务器名称：{{ netWorkData.title }}</view>
+				<view class="ip">IP地址：203.195.236.210</view>
 			</view>
 			<view class="server-box">
 				<view class="bar-item">
 					<text>负载：</text>
-					<view class="progress"><view class="active" style="width: 50%;"></view></view>
-					<text class="occupy">50%</text>
+					<view class="progress">
+						<view class="active" :style="`width: ${Math.round((netWorkData.load.one / netWorkData.load.max) * 100)}%;`"></view>
+						<text class="occupy">{{Math.round((netWorkData.load.one / netWorkData.load.max) * 100)}}%</text>
+					</view>
 				</view>
 				<view class="bar-item">
 					<text>CPU：</text>
-					<view class="progress"><view class="active" style="width: 30%;"></view></view>
-					<text class="occupy">30%</text>
+					<view class="progress">
+						<view class="active" :style="`width: ${netWorkData.cpu[0]}%;`"></view>
+						<text class="occupy">{{ netWorkData.cpu[0] }}%</text>
+					</view>
 				</view>
 				<view class="bar-item">
 					<text>RAM：</text>
-					<view class="progress"><view class="active" style="width: 10%;"></view></view>
-					<text class="occupy">10%</text>
+					<view class="progress">
+						<view class="active" :style="`width: ${((netWorkData.mem.memRealUsed / netWorkData.mem.memTotal) * 100).toFixed(1)}%;`"></view>
+						<text class="occupy">{{ ((netWorkData.mem.memRealUsed / netWorkData.mem.memTotal) * 100).toFixed(1) }}%</text>
+					</view>
 				</view>
 				<view class="bar-item">
 					<text>ROM：</text>
-					<view class="progress"><view class="active" style="width: 20%;"></view></view>
-					<text class="occupy">20%</text>
+					<view class="progress">
+						<view class="active" :style="`width: ${netWorkData.disk[0].size[3]}`"></view>
+						<text class="occupy">{{ netWorkData.disk[0].size[3] }}</text>
+					</view>
 				</view>
 			</view>
 
 			<view class="network">
-				<view class="item">上行：1MB/S</view>
-				<view class="item">下行：10MB/S</view>
-				<view class="item">运行时间10天</view>
+				<view class="item">上行：{{ netWorkData.up }}KB/S</view>
+				<view class="item">下行：{{ netWorkData.down }}KB/S</view>
+				<view class="item">运行时间{{ netWorkData.time }}</view>
 			</view>
 
 			<view class="card">
 				<view class="item">
 					<text class="name">WEB</text>
-					<text>2</text>
+					<text>{{ netWorkData.site_total }}</text>
 				</view>
 				<view class="item">
 					<text class="name">SQL</text>
-					<text>3</text>
+					<text>{{ netWorkData.database_total }}</text>
 				</view>
 				<view class="item">
 					<text class="name">FTP</text>
-					<text>3</text>
+					<text>{{ netWorkData.ftp_total }}</text>
 				</view>
 			</view>
 		</view>
@@ -73,6 +81,7 @@
 
 <script>
 import Request from '@/plugins/request/pocky-request_v.2.0.4/index.js';
+import md5 from 'js-md5';
 export default {
 	data() {
 		return {
@@ -81,6 +90,138 @@ export default {
 			cityName: '北京',
 			time: '',
 			date: '',
+			netWorkData: {
+				network: {
+					eth0: {
+						upTotal: 8111547090,
+						downTotal: 5042349062,
+						up: 1.13,
+						down: 0.57,
+						downPackets: 37382749,
+						upPackets: 41950137
+					},
+					lo: {
+						upTotal: 100891983,
+						downTotal: 100891983,
+						up: 0,
+						down: 0,
+						downPackets: 1224289,
+						upPackets: 1224289
+					}
+				},
+				upTotal: 8212439073,
+				downTotal: 5143241045,
+				up: 1.13,
+				down: 0.57,
+				downPackets: 38607038,
+				upPackets: 43174426,
+				cpu: [1, 1, [2.3], 'Intel(R) Xeon(R) CPU E5-26xx v4 * 1', 1, 1],
+				cpu_times: {
+					user: 1.1,
+					nice: 0,
+					system: 1.1,
+					idle: 97.6,
+					iowait: 0.2,
+					irq: 0,
+					softirq: 0,
+					steal: 0,
+					guest: 0,
+					guest_nice: 0,
+					总进程数: 102,
+					活动进程数: 2
+				},
+				load: {
+					one: 0.12,
+					five: 0.07,
+					fifteen: 0.1,
+					max: 2,
+					limit: 2,
+					safe: 1.5
+				},
+				mem: {
+					memTotal: 1838,
+					memFree: 134,
+					memBuffers: 64,
+					memCached: 1120,
+					memRealUsed: 520
+				},
+				version: '7.6.0',
+				disk: [
+					{
+						filesystem: '/dev/vda1',
+						type: 'ext3',
+						path: '/',
+						size: ['50G', '7.2G', '40G', '16%'],
+						inodes: ['3276800', '107012', '3169788', '4%']
+					}
+				],
+				title: 'SeanLinux',
+				time: '65天',
+				site_total: 1,
+				ftp_total: 0,
+				database_total: 1,
+				system: 'CentOS  7.2.1511(Py3.7.9)',
+				installed: true,
+				user_info: {
+					status: true,
+					msg: '获取成功!',
+					data: {
+						username: '159****9941'
+					}
+				},
+				iostat: {
+					ALL: {
+						read_count: 0,
+						write_count: 8,
+						read_bytes: 0,
+						write_bytes: 81152,
+						read_time: 0,
+						write_time: 19,
+						read_merged_count: 0,
+						write_merged_count: 10
+					},
+					vda: {
+						read_count: 0,
+						write_count: 4,
+						read_bytes: 0,
+						write_bytes: 40576,
+						read_time: 0,
+						write_time: 19,
+						read_merged_count: 0,
+						write_merged_count: 5
+					},
+					vda1: {
+						read_count: 0,
+						write_count: 4,
+						read_bytes: 0,
+						write_bytes: 40576,
+						read_time: 0,
+						write_time: 19,
+						read_merged_count: 0,
+						write_merged_count: 5
+					},
+					sr0: {
+						read_count: 0,
+						write_count: 0,
+						read_bytes: 0,
+						write_bytes: 0,
+						read_time: 0,
+						write_time: 0,
+						read_merged_count: 0,
+						write_merged_count: 0
+					},
+					loop0: {
+						read_count: 0,
+						write_count: 0,
+						read_bytes: 0,
+						write_bytes: 0,
+						read_time: 0,
+						write_time: 0,
+						read_merged_count: 0,
+						write_merged_count: 0
+					}
+				}
+			},
 			weatherInfo: {
 				obsTime: '2021-06-30T14:55+08:00',
 				temp: '29',
@@ -150,6 +291,20 @@ export default {
 			if (ssid != '<unknown ssid>' && ssid.toUpperCase() != '0X') {
 				this.netWorkName = `WIFI：${ssid.replace(/\"/g, '')}`;
 			}
+
+			const timestamp = new Date().getTime().toString();
+			const key = 'dibLcNfPJZF1HgFYUGyi0sGrRxi0VKFI';
+			Request()
+				.post('http://203.195.236.210:8808//system?action=GetNetWork', {
+					data: {
+						api_sk: key,
+						request_time: timestamp,
+						request_token: md5(timestamp + md5(key))
+					}
+				})
+				.then(res => {
+					this.netWorkData = res
+				});
 		},
 		updateTime() {
 			const week = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
@@ -239,8 +394,8 @@ export default {
 	.device-info {
 		margin: 0 auto;
 		border-radius: 10rpx;
-		width: 80%;
-		font-size: 16rpx;
+		width: 90%;
+		font-size: 14rpx;
 		text-align: center;
 		padding: 12rpx 0;
 		display: flex;
@@ -262,7 +417,7 @@ export default {
 	}
 	.info {
 		display: flex;
-		padding: 0 20rpx;
+		padding: 0 4rpx;
 		justify-content: space-between;
 		.name {
 			font-size: 16rpx;
@@ -286,14 +441,14 @@ export default {
 				background-color: #444444;
 				display: inline-flex;
 				align-items: center;
-				margin-right: 6rpx;
 				.active {
 					height: 100%;
 					background-color: #fff;
 					transition: all 0.4s ease;
 				}
 				.occupy {
-					font-size: 12rpx;
+					margin-left: 6rpx;
+					font-size: 10rpx;
 				}
 			}
 		}
