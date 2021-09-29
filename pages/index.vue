@@ -291,11 +291,12 @@ export default {
 			if (ssid != '<unknown ssid>' && ssid.toUpperCase() != '0X') {
 				this.netWorkName = `WIFI：${ssid.replace(/\"/g, '')}`;
 			}
-
+			
+			// 获取服务器信息（简单点可以直接用宝塔面板api）
 			const timestamp = new Date().getTime().toString();
-			const key = 'dibLcNfPJZF1HgFYUGyi0sGrRxi0VKFI';
+			const key = '宝塔api的Key';
 			Request()
-				.post('http://203.195.236.210:8808//system?action=GetNetWork', {
+				.post('宝塔api端口//system?action=GetNetWork', {
 					data: {
 						api_sk: key,
 						request_time: timestamp,
